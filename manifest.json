@@ -1,0 +1,45 @@
+{
+    "manifest_version": 3,
+    "name": "Sustainability Score",
+    "version": "1.0",
+    "description": "An eco-friendly shopping assistant.",
+    "permissions": [
+        "activeTab",
+        "storage",
+        "tabs",
+        "scripting",
+        "geolocation"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content.js"]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Check sustainability",
+        "default_icon": {
+            "16": "icons/icon16.png",
+            "48": "icons/icon48.png",
+            "128": "icons/icon128.png"
+        }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["libs/*.js", "envir_scores.csv"],
+            "matches": ["<all_urls>"]
+        }
+    ],
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self';"
+    }
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-Friendly Shopping Assistant</title>
+    <script src="libs/fuse.js" defer></script>
+    <script src="libs/papaparse.min.js" defer></script>
+    <script src="popup.js" defer></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 14.625px; 
+            width: 262.125px; 
+            height: 450px; 
+            background-color: #f0f8f0; 
+            color: #2e7d32; 
+            border-radius: 5.625px; 
+            box-shadow: 0 0 7.875px rgba(0, 0, 0, 0.1); 
+            overflow-y: auto; 
+        }
+        h2 { 
+            text-align: center; 
+            font-size: 18px; 
+            margin-bottom: 14.625px; 
+        }
+        .btn { 
+            background-color: #4CAF50; 
+            color: white; 
+            padding: 9px; 
+            border: none; 
+            border-radius: 3.375px; 
+            cursor: pointer; 
+            font-size: 12.375px; 
+            width: 100%; 
+            margin-top: 14.625px; 
+        }
+        .btn:hover {
+            background-color: #45a049; 
+        }
+        #sustainability-score {
+            margin-top: 14.625px; 
+            font-size: 12.375px; 
+        }
+        #sustainability-score .score-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .score, .percentile {
+            font-weight: bold;
+            font-size: 13.5px; 
+        }
+        #ghg-calculation, #emissions {
+            margin-top: 14.625px; 
+            font-size: 12.375px; 
+            border-top: 1.125px solid #ddd; 
+            padding-top: 7.875px; 
+        }
+        #current-location {
+            margin-top: 14.625px; 
+            font-size: 12.375px; 
+        }
+        .product-detail {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #333;
+        }
+        .product-detail strong {
+            color: #2e7d32;
+        }
+        #product-details {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Eco-Friendly Shopping Assistant</h2>
+    
+    <div id="emissions"></div>
+
+    <div id="sustainability-score">
+        <div class="score-details">
+            <span class="score">Score: <span id="score"></span></span>
+            <span class="percentile">Percentile: <span id="percentile"></span></span>
+        </div>
+    </div>
+
+    <div id="ghg-calculation"></div>
+
+    <div id="current-location"></div>
+
+    <button id="check-btn" class="btn">Check This Product</button>
+
+    <button id="cart-btn" class="btn">Show Cart Contents</button>
+
+    <div id="result"></div>
+</body>
+</html>
