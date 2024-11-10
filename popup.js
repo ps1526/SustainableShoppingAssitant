@@ -292,214 +292,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return null;
         }
     }
-    
-    /*
-    async function extractProductDetailsFromText(html) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        
-        // Get all text content from the page
-        const pageText = doc.body.innerText.toLowerCase();
-        
-        // Helper function to find matches with both direct and fuzzy matching
-        function findMatches(text, searchTerms, targetTerms, windowSize = 100) {
-            // Helper function for fuzzy matching
-            function fuzzyMatch(text, term) {
-                text = text.toLowerCase();
-                term = term.toLowerCase();
-                
-                // Direct includes
-                if (text.includes(term)) return true;
-                
-                // Check for plural forms
-                if (text.includes(term + 's')) return true;
-                if (text.includes(term + 'es')) return true;
-                
-                // Check for hyphenated forms
-                if (text.includes(term.replace(' ', '-'))) return true;
-                
-                return false;
-            }
-    
-            // First try direct pattern matching
-            for (const searchTerm of searchTerms) {
-                const pattern = new RegExp(`${searchTerm}\\s*([\\w\\s,-]+)(?=[.,\\n]|$)`, 'i');
-                const match = text.match(pattern);
-                if (match) {
-                    const contextAfterLabel = match[1].toLowerCase().trim();
-                    for (const target of targetTerms) {
-                        if (fuzzyMatch(contextAfterLabel, target)) {
-                            return {
-                                value: target,
-                                isDirectMatch: true
-                            };
-                        }
-                    }
-                }
-            }
-    
-            // If no direct match, look for content around keywords
-            for (const searchTerm of searchTerms) {
-                const index = text.indexOf(searchTerm.toLowerCase());
-                if (index !== -1) {
-                    const start = Math.max(0, index - windowSize);
-                    const end = Math.min(text.length, index + searchTerm.length + windowSize);
-                    const context = text.slice(start, end);
-                    
-                    for (const target of targetTerms) {
-                        if (fuzzyMatch(context, target)) {
-                            return {
-                                value: target,
-                                isDirectMatch: false
-                            };
-                        }
-                    }
-                }
-            }
-    
-            // Final attempt: look for product terms anywhere in the text
-            for (const target of targetTerms) {
-                if (fuzzyMatch(text, target)) {
-                    return {
-                        value: target,
-                        isDirectMatch: false
-                    };
-                }
-            }
-            
-            return null;
-        }
-    
-        // Expanded materials list
-        const materials = [
-            // Natural fibers
-            'cotton', 'organic cotton', 'wool', 'merino wool', 'cashmere', 'silk', 'linen', 'hemp',
-            // Synthetic fibers
-            'polyester', 'nylon', 'spandex', 'elastane', 'lycra', 'acrylic', 'rayon', 'viscose', 'synthetic',
-            // Leather and alternatives
-            'leather', 'suede', 'faux leather', 'vegan leather', 'pu leather',
-            // Blends and specialty materials
-            'cotton blend', 'wool blend', 'cotton-polyester', 'modal', 'tencel', 'bamboo',
-            // Technical materials
-            'gore-tex', 'polartec', 'cordura', 'kevlar',
-            // Sustainable materials
-            'recycled polyester', 'organic hemp', 'recycled cotton', 'econyl'
-        ];
-    
-        // Expanded product types with categories and variations
-        const productTypes = {
-            tops: [
-                't-shirt', 'shirt', 'polo', 'polo shirt', 'blouse', 'tank top', 'sweater', 
-                'sweatshirt', 'hoodie', 'cardigan', 'tunic', 'crop top', 'jersey',
-                'turtleneck', 'henley', 'button-up', 'button-down'
-            ],
-            bottoms: [
-                'pants', 'jeans', 'trousers', 'shorts', 'skirt', 'leggings', 'chinos',
-                'joggers', 'sweatpants', 'cargo pants', 'bermuda shorts', 'capri pants',
-                'culottes', 'palazzo pants'
-            ],
-            dresses: [
-                'dress', 'maxi dress', 'mini dress', 'midi dress', 'gown', 'sundress',
-                'shirt dress', 'wrap dress', 'cocktail dress', 'evening dress'
-            ],
-            outerwear: [
-                'jacket', 'coat', 'blazer', 'windbreaker', 'parka', 'raincoat',
-                'vest', 'bomber jacket', 'denim jacket', 'leather jacket', 'peacoat'
-            ],
-            activewear: [
-                'sports bra', 'athletic shorts', 'running tights', 'gym shirt',
-                'workout top', 'tennis skirt', 'track pants', 'yoga pants'
-            ],
-            swimwear: [
-                'swimsuit', 'bikini', 'swim trunks', 'one-piece', 'boardshorts',
-                'rash guard', 'swim shorts'
-            ],
-            accessories: [
-                'hat', 'cap', 'scarf', 'gloves', 'belt', 'tie', 'socks',
-                'beanie', 'headband', 'wristband', 'bandana'
-            ],
-            footwear: [
-                'shoes', 'sneakers', 'boots', 'sandals', 'slippers', 'loafers',
-                'heels', 'flats', 'oxford shoes', 'athletic shoes', 'running shoes'
-            ],
-            underwear: [
-                'underwear', 'bra', 'briefs', 'boxers', 'panties', 'lingerie',
-                'undershirt', 'boxer briefs', 'thong', 'boyshorts'
-            ]
-        };
-    
-        // Flatten product types for searching
-        const flattenedProductTypes = Object.values(productTypes).flat();
-    
-        // Material detection
-        const materialKeywords = [
-            'material:', 'fabric:', 'made from', 'composition:', 
-            'made of', 'materials used:', 'fabric composition',
-            'shell:', 'outer:', 'lining:', 'main:'
-        ];
-        const materialMatch = findMatches(pageText, materialKeywords, materials);
-        const detectedMaterial = materialMatch ? materialMatch.value : null;
-    
-        // Manufacturing location detection
-        const locationKeywords = [
-            'made in', 'manufactured in', 'origin:', 
-            'country of origin', 'imported from', 'produced in',
-            'manufactured by', 'factory location'
-        ];
-        const countries = [
-            'china', 'india', 'bangladesh', 'vietnam', 'turkey', 
-            'italy', 'usa', 'spain', 'portugal', 'japan',
-            'indonesia', 'cambodia', 'thailand', 'mexico', 'pakistan',
-            'sri lanka', 'morocco', 'taiwan', 'south korea', 'malaysia'
-        ];
-        const locationMatch = findMatches(pageText, locationKeywords, countries);
-        const manufacturingLocation = locationMatch ? 
-            locationMatch.value.charAt(0).toUpperCase() + locationMatch.value.slice(1) : 
-            null;
-    
-        // Product type detection with fuzzy matching
-        const productTypeKeywords = [
-            'category:', 'product type:', 'department:', 
-            'section:', 'collection:', 'style:', 'item type:',
-            'product:', 'clothing type:'
-        ];
-        const typeMatch = findMatches(pageText, productTypeKeywords, flattenedProductTypes);
-        const productType = typeMatch ? typeMatch.value : null;
-    
-        // Find product name
-        const titleElement = doc.querySelector('title');
-        const productName = titleElement ? 
-            titleElement.innerText.split('|')[0].trim() : 
-            'Product name not found';
-    
-    
-        // Get product category based on detected type
-        let productCategory = null;
-        if (productType) {
-            for (const [category, types] of Object.entries(productTypes)) {
-                if (types.some(type => type.toLowerCase() === productType.toLowerCase())) {
-                    productCategory = category;
-                    break;
-                }
-            }
-        }
-    
-        return {
-            name: productName,
-            type: productType || 'Type not detected',
-            category: productCategory || 'Category not detected',
-            material: detectedMaterial || 'Material not detected',
-            manufacturingLocation: manufacturingLocation || 'Location not detected',
-            confidence: {
-                material: materialMatch?.isDirectMatch ? 'high' : 'medium',
-                location: locationMatch?.isDirectMatch ? 'high' : 'medium',
-                productType: typeMatch?.isDirectMatch ? 'high' : 'medium'
-            },
-            emissionScore: detectedMaterial ? 
-                'test co2' : null
-        };
-    }
-    */ 
+
     async function extractProductDetailsFromText(html) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -649,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'turtleneck', 'henley', 'button-up', 'button up', 'button-down', 'button down', 'pullover',
                 'top', 'long sleeve', 'short sleeve', 'sleeveless', 'v-neck', 'crew neck', 'mock neck',
                 'muscle tank', 'cami', 'camisole', 'raglan', 'baseball tee', 'crop', 'cropped',
-                'thermal', 'compression', 'base layer', 'tee shirt'
+                'thermal', 'compression', 'base layer', 'tee shirt', 'jersey'
             ],
             bottoms: [
                 'pants', 'jeans', 'trousers', 'shorts', 'skirt', 'leggings', 'chinos', 'khakis',
@@ -681,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'windcheater', 'gilet', 'overcoat', 'mac coat', 'poncho', 'cape', 'cardigan coat',
                 'shacket', 'shirt jacket', 'anorak', 'duffle coat', 'duffel coat', 'quilted jacket',
                 'insulated jacket', 'performance jacket', 'outdoor jacket', 'running jacket',
-                'training jacket', 'warm up jacket', 'tracksuit jacket'
+                'training jacket', 'warm up jacket', 'tracksuit jacket', 'jersey'
             ],
             activewear: [
                 'sports bra', 'athletic shorts', 'running tights', 'gym shirt', 'workout top',
@@ -691,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'warm up jacket', 'track suit', 'tracksuit', 'jersey', 'athletic dress', 'tennis dress',
                 'gym shorts', 'volleyball shorts', 'bike shorts', 'cycling shorts', 'dance pants',
                 'dance top', 'yoga top', 'athletic skirt', 'performance tank', 'muscle tank',
-                'training shirt', 'workout set', 'active set', 'athletic set', 'fitness wear'
+                'training shirt', 'workout set', 'active set', 'athletic set', 'fitness wear', 'jersey'
             ],
             swimwear: [
                 'swimsuit', 'swim suit', 'bikini', 'swim trunks', 'one-piece', 'one piece',
